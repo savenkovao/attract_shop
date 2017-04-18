@@ -113,8 +113,14 @@ $( "form" ).on( "submit", function( event ) {
 	formResult.forEach(function (item, i, arr){
 		if(formResult.length ==1){
 			getFilterCity( (parseInt(item.value)) );
-			filterCategory = filterCity;
+			console.log(filterCity);
+
+			filterCity.forEach(function (item, i, arr){
+				filterCategory.push(item);
+			});
+			console.log(filterCategory);
 		} else {
+
 			if(item.name == 'city'){
 				getFilterCity( (parseInt(item.value)) );
 			}else if(item.name == 'category'){
@@ -129,7 +135,8 @@ $( "form" ).on( "submit", function( event ) {
 
 		Data.forEach(function(item, i, arr) {
 			if (item.city === filterValue) {
-				filterCity.push(item);	
+				var newItem = $.extend(true, {}, item);
+				filterCity.push(newItem);	
 			}
 		});
 	}
@@ -139,12 +146,13 @@ $( "form" ).on( "submit", function( event ) {
 
 		filterCity.forEach(function(item, i, arr) {
 			if (item.category === filterValue) {
-				filterCategory.push(item);	
+				var newItem = $.extend(true, {}, item);
+				filterCategory.push(newItem);	
 			}
 		});
 	}
 
-console.log(filterCategory);
+
 
 	filterCategory.map(function (item, i, arr){
 		item.city = getCityName(item.city);
@@ -161,10 +169,10 @@ console.log(filterCategory);
 		if( filterCategory.length > 0){
 			decrypData = filterCategory;
 			dataContent = tmpl(dataTempl, decrypData);
-			console.log(filterCategory);
+			// console.log(filterCategory);
 		} else if (filterCategory.length == 0){
 			dataContent = '<p>There is no matched elements</p>';
-			console.log(filterCategory);
+			// console.log(filterCategory);
 		}
 
 		$("#filter-data").append(dataContent);
