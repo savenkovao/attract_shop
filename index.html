@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Shop</title>
+
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="src/css/bootstrap.min.css">
+	<link rel="stylesheet" href="src/css/jquery-ui.css">
+	<link rel="stylesheet" href="src/css/style.css?ver_1.0">
+
+</head>
+<body>
+
+	<div class="wrap">
+		<main>
+			<div class="catalog">
+				<div class="container">
+					<div class="row">		
+
+						<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<div id="filter-toggle" class="filter-toggle">
+								<span class="filter-toggle__txt">Filter</span>
+							</div>
+
+							<div id="filter" class="filter">
+								<form action="#" method="post">
+
+									<div class="filter-cnt">
+										<div class="filter-city">
+											<div class="filter-city__cnt-hdr">
+												<span class="filter-city__hdr">City</span>
+											</div>
+										
+											<div class="filter-city__cnt-sel">
+												<select id="filter-city" class="filter-city__sel" name="city">
+
+												</select>
+											</div>
+										</div>
+										<div class="filter-categ">
+											<div class="filter-categ__cnt-hdr">
+												<span class="filter-categ__hdr">Categories</span>
+											</div>
+										
+											<div id="filter-category" class="filter-categ__cnt-inp">
+															
+											</div>										
+										</div>
+										<div class="filter-price">
+										
+											<div class="filter-price__cnt-hdr">
+												<span class="filter-price__hdr">Price</span>
+											</div>
+										
+											<div class="filter-price__range-cnt">
+
+												<div class="filter-price__range-sl-cnt">
+													<div id="slider-range" class="filter-price__range-sl"></div>
+												</div>
+																						
+												<div class="filter-price__range-res">
+													<div class="filter-price__range-txt-cnt">
+														<p class="filter-price__range-txt">
+														  <input type="text" id="amount" readonly>
+														</p>
+													</div>																					
+													
+													<div class="filter-price__btn-cnt">
+														<button type="submit" class="filter-price__btn">Filter</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+								</form>
+							</div>
+						</div>
+
+						<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+							<div id="filter-data" class="content">
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+
+
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+	<script src="data/category.js"></script>
+	<script src="data/city.js"></script>
+	<script src="data/data.js"></script>
+
+	<script src="src/js/tmpl.js"></script>
+	<script src="src/js/main.js"></script>
+
+
+	<script type="text/template" id="cityTempl">
+		<% for (var i = 0; i < City.length; i++) { %>
+				<option value="<%= City[i].id %>"><%= City[i].name %></option>
+		<% }; %>
+	</script>
+
+	<script type="text/template" id="categoryTempl">
+		<% for (var i = 0; i < decrypCategory.length; i++) { %>
+			<div class="filter-categ__cnt-ch-box">
+				<label>
+					<input type="checkbox" name="category" value="<%= decrypCategory[i].id %>" class="filter-categ__ch-box"><%= decrypCategory[i].name %>
+					<span class="badge"><%= decrypCategory[i].count %></span>
+				</label>
+			</div>
+		<% }; %>
+	</script>
+
+
+	<script type="text/template" id="dataTempl">
+		<% for (var i = 0; i < decrypData.length; i++) { %>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 content-item-cnt">										
+					<a href="#"><div class="content-item">
+							<div class="content-item__pic">
+								<div class="filter-item__pic-cnt">
+									<img class="content-item__pic-img" src="src/img/cnt/default.jpg" alt="Photo">
+									<div class="content-item__pic-txt-cnt">
+										<span class="content-item__pic-txt"><%= decrypData[i].city %></span>
+									</div>
+								</div>
+							</div>
+						
+							<div class="content-item__txt">
+								<div class="content-item__txt-hdr-cnt">
+									<h6 class="content-item__txt-hdr"><%= decrypData[i].name %></h6>
+								</div>
+						
+								<div class="content-item__txt-dscr-cnt clearfix">
+									<span class="content-item__txt-categ"><%= decrypData[i].category %></span>
+									<span class="content-item__txt-price">$<%= decrypData[i].price %></span>
+								</div>
+							</div>										
+						</div></a>
+				</div>
+
+		<% }; %>
+	</script>
+
+
+
+</body>
+</html>
