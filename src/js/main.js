@@ -1,193 +1,167 @@
-// global vars
-
-var decrypData=[];
-var decrypCategory=[];
+var SELECTED_ITEMS;
 
 $(function () {
+
+	var _filtersObj;
+	var _selectedCategories;
+	var _selectedPrices;
+
+	var _filteredByCities;
+	var _filteredByCategories;
+	SELECTED_ITEMS = [];
+	copyData();
+	decryptData();
+
+	// displaying City elements
+	var cityTempl = $('#cityTempl').html();
+	var cityContent = tmpl(cityTempl, City) ;
+	$("#filter-city").append(cityContent);
+
+	// displaying Category elements
+	var categoryTempl = $('#categoryTempl').html();
+	var categoryContent = tmpl(categoryTempl, Category);
+	$("#filter-category").append(categoryContent);
+
+	// displaying Category elements
+	var dataTempl = $('#dataTempl').html();
+	var dataContent = tmpl(dataTempl, SELECTED_ITEMS);
+	$("#filter-data").append(dataContent);
+
+	// slider range
+	$( "#slider-range" ).slider({
+	    range: true,
+	    min: getMinPrice(),
+	    max: getMaxPrice(),
+	    values: [0, 250 ],
+	    slide: function( event, ui ) {
+	      $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+	    }
+	  });
+	  $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) + " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+
+
+	//Events
 	// Filter toggle
-	
 	$("#filter-toggle").on('click', function() {
-	
 		$("#filter").toggle();
 	});
 
 	$(window).on('resize', resizeFunc);
 
-	function resizeFunc() {
-		if( $(window).width() > 786) $("#filter").removeAttr('style');
-	}
+	// Processing filters form
+	$(document).on('submit', '#filter-form', function(e) {
+		_selectedCategories = [];
+		_selectedPrices = [];
 
+		_filteredByCities=[];
+		_filteredByCategories=[];
+		SELECTED_ITEMS =[];
+		copyData();
 
-	// displaying City elements
+		_filtersObj = {
+			city: $('#filter-city').find('option:selected').val(),
+			category: getCategories(),
+			price: getPrice()
+		};
 
-	var cityTempl = $('#cityTempl').html();
-	var cityContent = tmpl(cityTempl,City) ;
-
-	$("#filter-city").append(cityContent);
-
-	// displaying Category elements
-	mapCategory();
-	var categoryTempl = $('#categoryTempl').html();
-	var categoryContent = tmpl(categoryTempl,decrypCategory) ;
-
-	$("#filter-category").append(categoryContent);
-
-
-	// displaying Data elements
-	mapData();
-	var dataTempl = $('#dataTempl').html();
-	var dataContent = tmpl(dataTempl,decrypData) ;
-
-	$("#filter-data").append(dataContent);
-
-
-
-// decrypting Data and filling decrypData
-	function mapData() {
-	
-		Data.forEach(function (item, i, arr){
-			var newItem = $.extend(true, {}, item);
-			decrypData.push(newItem);
+		//filter by city id
+		$(SELECTED_ITEMS).filter(function( i, item ) {
+			if(this.city == +_filtersObj.city || _filtersObj.city === "") {
+				return _filteredByCities.push(this);
+			}
 		});
 
-		decrypData.map(function (item, i, arr){
-			item.city = getCityName(item.city);
-			item.category = getCategoryName(item.category);
+		//filter by categories id
+		$(_filteredByCities).filter(function( i, item ) {
+			var that = this;
+
+			if(_filtersObj.category.length){
+				$(_filtersObj.category).each(function (i, item) {
+					if(that.category === +item) {
+						return _filteredByCategories.push(that);
+					}
+				});
+			} else {
+				return _filteredByCategories.push(that);
+			}
 		});
 
-	}	
-
-
-	function getCityName(argId) {
-		for (var i =0; i < City.length; i++) {
-			if(City[i].id == argId){				
-				return City[i].name;
+		//filter by min & max prices
+		SELECTED_ITEMS =[];
+		$(_filteredByCategories).filter(function (i, item) {
+			if(item.price >= _filtersObj.price[0] && item.price <= _filtersObj.price[1]){
+				return SELECTED_ITEMS.push(item);
 			}
-		}
-	}
-
-	function getCategoryName(argId) {
-		for (var i = 0; i < Category.length; i++) {
-			if(Category[i].id == argId){				
-				return Category[i].name;
-			}
-		}
-	}
-
-
-
-// decrypting Category and filling decrypCategory
-	function mapCategory() {
-		Category.forEach(function (item, i, arr){
-			decrypCategory.push(item);
-			item.count = 0;
-			item.count = getCategoryCount(item.id, item.count);
 		});
-	}
 
-	function getCategoryCount(id, count) {
-		for (var i =0; i < Data.length; i++) {
-			if(Data[i].category == id){		
-				count++;
-			}
-		}
-		return count;
-	}
+		decryptData();
+		appendElements();
+	});
 
 
-
-
-
-
-// form processing
-
-
-$( "form" ).on( "submit", function( event ) {
-
-  event.preventDefault();
-  var formResult = $(this).serializeArray();
-	var filterCity=[];
-	var filterCategory=[];
-	console.log(formResult);
-
-	formResult.forEach(function (item, i, arr){
-		if(formResult.length ==1){
-			getFilterCity( (parseInt(item.value)) );
-			console.log(filterCity);
-
-			filterCity.forEach(function (item, i, arr){
-				filterCategory.push(item);
+	// services
+	// decrypt data from 'id' to 'name'
+	function decryptData() {
+		$(SELECTED_ITEMS).each(function (i, item) {
+			var selectedItem = item;
+			$(City).each(function (i, item) {
+				if(selectedItem.city === item.id ){
+					selectedItem.city = item.name;
+				}
 			});
-			console.log(filterCategory);
+
+			$(Category).each(function (i, item) {
+				if(selectedItem.category === item.id ){
+					selectedItem.category = item.name;
+				}
+			});
+		});
+
+		return SELECTED_ITEMS;
+	}
+
+	// get selected categories
+	function getCategories(){
+		var $selectedItems = $('#filter-category').find('input[type="checkbox"]:checked');
+
+		$selectedItems.each(function (i, elem) {
+			_selectedCategories.push(+elem.value);
+		});
+
+		return _selectedCategories;
+	}
+
+	// get selected prices
+	function getPrice() {
+		var price = $("#amount").val().split(' - ');
+		var reg = /\d/g;
+
+		$(price).each(function (i, item) {
+			_selectedPrices.push( +(item.replace(/\D/g, "")) );
+		});
+
+		return _selectedPrices;
+	}
+
+	// addElements();
+	function appendElements(){
+		$("#filter-data").children().remove();
+
+		if(SELECTED_ITEMS.length > 0){
+			dataContent = tmpl(dataTempl, SELECTED_ITEMS);
 		} else {
-
-			if(item.name == 'city'){
-				getFilterCity( (parseInt(item.value)) );
-			}else if(item.name == 'category'){
-				getFilterCategory( (parseInt(item.value)) );
-			}			
-		}
-		
-	});
-
-// filter by city name
-	function getFilterCity(filterValue){
-
-		Data.forEach(function(item, i, arr) {
-			if (item.city === filterValue) {
-				var newItem = $.extend(true, {}, item);
-				filterCity.push(newItem);	
-			}
-		});
-	}
-
-// filter by category name
-	function getFilterCategory(filterValue){
-
-		filterCity.forEach(function(item, i, arr) {
-			if (item.category === filterValue) {
-				var newItem = $.extend(true, {}, item);
-				filterCategory.push(newItem);	
-			}
-		});
-	}
-
-
-
-	filterCategory.map(function (item, i, arr){
-		item.city = getCityName(item.city);
-		item.category = getCategoryName(item.category);
-	});
-
-// displaying filtered elements
-
-	$("#filter-data").children().remove();
-	addElements();
-	
-	function addElements(){
-
-		if( filterCategory.length > 0){
-			decrypData = filterCategory;
-			dataContent = tmpl(dataTempl, decrypData);
-			// console.log(filterCategory);
-		} else if (filterCategory.length == 0){
-			dataContent = '<p>There is no matched elements</p>';
-			// console.log(filterCategory);
+			dataContent = '<p>There are no matched elements</p>'
 		}
 
 		$("#filter-data").append(dataContent);
+
 	}
 
-});
-
-
-
-// get min&max values for slider range
-	
+	// get min&max values for slider range
 	function getPrices() {
 		var pricesArray = [];
 
-		Data.forEach(	function (item, i, arr) {
+		Data.forEach(function (item, i, arr) {
 			pricesArray.push(item.price);
 		});
 
@@ -204,22 +178,19 @@ $( "form" ).on( "submit", function( event ) {
 		return Math.max.apply( Math, maxArray );
 	}
 
+	// on resize window
+	function resizeFunc() {
+		if( $(window).width() > 786) $("#filter").removeAttr('style');
+	}
 
-// slider range    
-
-	$( "#slider-range" ).slider({
-    range: true,
-    min: getMinPrice(),
-    max: getMaxPrice(),
-    values: [0, 250 ],
-    slide: function( event, ui ) {
-      $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-    }
-  });
-  $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-    " - $" + $( "#slider-range" ).slider( "values", 1 ) );
-
-
+	// clone Data object
+	function copyData() {
+		Data.forEach(function (item) {
+			var newItem = {};
+			var newItem=JSON.parse(JSON.stringify(item));
+			SELECTED_ITEMS.push(newItem);
+		});
+	}
 });
 
 

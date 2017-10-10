@@ -24,7 +24,7 @@
 							</div>
 
 							<div id="filter" class="filter">
-								<form action="#" method="post">
+								<form action="" id="filter-form" onsubmit="return false">
 
 									<div class="filter-cnt">
 										<div class="filter-city">
@@ -62,7 +62,7 @@
 												<div class="filter-price__range-res">
 													<div class="filter-price__range-txt-cnt">
 														<p class="filter-price__range-txt">
-														  <input type="text" id="amount" readonly>
+														  <input type="text" id="amount" name="price" readonly>
 														</p>
 													</div>																					
 													
@@ -104,17 +104,18 @@
 
 
 	<script type="text/template" id="cityTempl">
+		<option value=""></option>
 		<% for (var i = 0; i < City.length; i++) { %>
 				<option value="<%= City[i].id %>"><%= City[i].name %></option>
 		<% }; %>
 	</script>
 
 	<script type="text/template" id="categoryTempl">
-		<% for (var i = 0; i < decrypCategory.length; i++) { %>
+		<% for (var i = 0; i < Category.length; i++) { %>
 			<div class="filter-categ__cnt-ch-box">
 				<label>
-					<input type="checkbox" name="category" value="<%= decrypCategory[i].id %>" class="filter-categ__ch-box"><%= decrypCategory[i].name %>
-					<span class="badge"><%= decrypCategory[i].count %></span>
+					<input type="checkbox" name="category" value="<%= Category[i].id %>" class="filter-categ__ch-box"><%= Category[i].name %>
+					<span class="badge"><%= Category[i].count %></span>
 				</label>
 			</div>
 		<% }; %>
@@ -122,26 +123,26 @@
 
 
 	<script type="text/template" id="dataTempl">
-		<% for (var i = 0; i < decrypData.length; i++) { %>
+		<% for (var i = 0; i < SELECTED_ITEMS.length; i++) { %>
 				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 content-item-cnt">										
 					<a href="#"><div class="content-item">
 							<div class="content-item__pic">
 								<div class="filter-item__pic-cnt">
 									<img class="content-item__pic-img" src="src/img/cnt/default.jpg" alt="Photo">
 									<div class="content-item__pic-txt-cnt">
-										<span class="content-item__pic-txt"><%= decrypData[i].city %></span>
+										<span class="content-item__pic-txt"><%= SELECTED_ITEMS[i].city %></span>
 									</div>
 								</div>
 							</div>
 						
 							<div class="content-item__txt">
 								<div class="content-item__txt-hdr-cnt">
-									<h6 class="content-item__txt-hdr"><%= decrypData[i].name %></h6>
+									<h6 class="content-item__txt-hdr"><%= SELECTED_ITEMS[i].name %></h6>
 								</div>
 						
 								<div class="content-item__txt-dscr-cnt clearfix">
-									<span class="content-item__txt-categ"><%= decrypData[i].category %></span>
-									<span class="content-item__txt-price">$<%= decrypData[i].price %></span>
+									<span class="content-item__txt-categ"><%= SELECTED_ITEMS[i].category %></span>
+									<span class="content-item__txt-price">$<%= SELECTED_ITEMS[i].price %></span>
 								</div>
 							</div>										
 						</div></a>
